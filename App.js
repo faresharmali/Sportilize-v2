@@ -8,6 +8,7 @@ import Dashboard from "./Screens/Dashboard";
 import LoadingScreen from "./Screens/LoadingScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+
 const App = () => {
   const [CurrentScreen, NavigateToScreen] = useState("Loading");
   const [LoggedInUser, setLoggedInUser] = useState("");

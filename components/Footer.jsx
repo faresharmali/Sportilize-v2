@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     backgroundColor: "#fff",
-    zIndex: 99,
     borderColor: "#000",
     borderWidth: 1,
     flexDirection: "row",

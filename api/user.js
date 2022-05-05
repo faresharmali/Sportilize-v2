@@ -1,6 +1,6 @@
 import { post } from "./index";
-const LyonApi =
-  "https://download.data.grandlyon.com/wfs/grandlyon?SERVICE=WFS&VERSION=2.0.0&request=GetFeature&typename=adr_voie_lieu.adrequipsportpct&outputFormat=application%2Fjson%3B%20subtype%3Dgeojson&SRSNAME=EPSG%3A4171&startIndex=0&count=100&fbclid=IwAR0V5nsGhLJ3uy91FQnUQx430ZkJEkj76bdyhsPGt2HX61Rzoz5kQL6Ox-E";
+const infrastructures =
+  "https://sportilize.herokuapp.com/api/v1/infrastructures/get_all_infrastructures";
 
 export const setDefaultUser = async (id, username) => {
   const newUser = {
@@ -32,9 +32,9 @@ export const Signup = async (id, { username, email, password, uuid }) => {
   return post("auth/register", null, newUser);
 };
 export const GetPois = async () => {
-  const res = await fetch(LyonApi, {
+  const res = await fetch(infrastructures, {
     method: "GET",
   });
   const data = await res.json();
-  return data;
+  return data
 };

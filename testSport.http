@@ -3,12 +3,9 @@
 post https://sportilize.herokuapp.com/api/v1/auth/login
 Content-Type: application/json
 
-
 {
-     "email": "test@mail.com",
-      "password": "jestTest123"
- 
-  }
-
+    "email":"test@mail.com",
+    "password":"jestTest123"
+}
 
   

@@ -1,0 +1,21 @@
+
+
+post https://sportilize.herokuapp.com/api/v1/events/create
+Content-Type: application/json
+Cookie: Authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZXhpc3RpbmdVc2VyIiwidXNlcm5hbWUiOiJqZXN0VGVzdFJlZ2lzdGVyIiwidXNlclJvbGUiOiJtZW1iZXIiLCJpYXQiOjE2NTE2ODQwNTAsImV4cCI6MTk2NzA0NDA1MH0.VJecD_723nt2X4wEi3k8l7QvUOHA4L0Qrn8DyG6fBTY; HttpOnly; Max-Age=315360000
+
+{
+       
+    "creator":"creatorUUID",
+    "participantsNumber":10,
+    "tags": ["team","volleyball","beach"],
+    "location" : "geoCoords",
+    "beginDate":"2022-06-02T23:00:00.000Z",
+    "endDate":"2022-06-02T23:00:00.000Z",
+    "infrastructure" : "Gymnase abc",
+    "description": "This is a great event",
+    "sports" : ["tennis","Lancer","badminton"]
+  }
+
+
+  

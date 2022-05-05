@@ -2,26 +2,32 @@ import React, { useState, useEffect } from "react";
 import { Layout, Icon } from "@ui-kitten/components";
 import { StyleSheet } from "react-native";
 import MapView from "react-native-maps";
-import { Callout } from "react-native-maps";
 import { GetPois } from "../../api/user";
-import Filter from "../../components/Filter";
-import { TouchableOpacity, View, Text } from "react-native";
 import MarkerPopover from "../../components/MarkerPopover";
-const Map = ({ navigation }) => {
+import LoadingBlockScreen from "../../components/LoadingBlockScreen";
+import { useNavigation } from "@react-navigation/native";
+
+const Map = () => {
+  const navigation = useNavigation();
+
   const [ModalVisible, setModalVisible] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [PopoverVisible, setPopoverVisible] = useState(false);
+  const [LoadingVisible, setLoadingVisibility] = useState(true);
   const [Allpois, setAllPois] = useState([]);
   const [Displayedpois, setDisplayedPois] = useState([]);
   useEffect(async () => {
+    let abortController = new AbortController();
     const data = await GetPois();
-    setAllPois(data.features);
-    setDisplayedPois(data.features);
+    setAllPois(data);
+    setDisplayedPois(data);
+    setLoadingVisibility(false);
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
-  const filterPois = () => {
-    // here we filter the data array according to some parameters
-    //code will be like : setDisplayedPois(Allpois.filter((p)=>p.properties.theme=="running"))
-    // this function should be passed to the filter component and called from there with the filtering parameters
-  };
+  
   return (
     <Layout style={styles.Container}>
       <MapView
@@ -35,31 +41,23 @@ const Map = ({ navigation }) => {
       >
         {Displayedpois.map((p) => (
           <MapView.Marker
-            key={p.properties.identifiant}
+            key={p.id}
             coordinate={{
-              latitude: p.geometry.coordinates[1],
-              longitude: p.geometry.coordinates[0],
+              latitude: parseFloat(JSON.parse(p.point).coordinates[0]),
+              longitude: parseFloat(JSON.parse(p.point).coordinates[1]),
             }}
-            title={p.properties.nom}
-            description={p.properties.soustheme}
-          >
-            <Callout style={styles.Callout}>
-              <MarkerPopover element={p.properties} />
-            </Callout>
-          </MapView.Marker>
+            onPress={() =>{setSelectedLocation(p),setPopoverVisible(true)}}
+          />
         ))}
       </MapView>
-      <TouchableOpacity
-        onPress={() => setModalVisible(true)}
-        style={styles.Fab}
-      >
-        <Icon style={styles.icon} fill="#000" name="menu-outline" />
-      </TouchableOpacity>
-      <Filter
-        filterPois={filterPois}
-        ModalVisible={ModalVisible}
-        setModalVisible={setModalVisible}
+     
+      <MarkerPopover
+        navigation={navigation}
+        ModalVisible={PopoverVisible}
+        setModalVisible={setPopoverVisible}
+        infrastructure={selectedLocation}
       />
+      {LoadingVisible && <LoadingBlockScreen />}
     </Layout>
   );
 };

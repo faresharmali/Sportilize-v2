@@ -14,50 +14,64 @@ import {
   SelectItem,
   Datepicker,
 } from "@ui-kitten/components";
-import Footer from "../../components/Footer";
-import Header from "../Header/Header";
-import { CreateAnEvent } from "../../api/Event.js";
-const CreateEvent = ({ navigation }) => {
-  // to check if a properety is not defined
-  const checkProperties = (obj) => {
-    let arr = [];
-    for (let key in obj) {
-      arr.push(obj[key] !== undefined && obj[key] !== null && obj[key] !== "");
-    }
-    return arr.includes(false);
-  };
+import { CreateAnEvent, GetSports } from "../../api/Event.js";
+import { useNavigation } from "@react-navigation/native";
+import LoadingBlockScreen from "../../components/LoadingBlockScreen";
+
+const checkProperties = (obj) => {
+  let arr = [];
+  for (let key in obj) {
+    arr.push(obj[key] !== undefined && obj[key] !== null && obj[key] !== "");
+  }
+  return arr.includes(false);
+};
+
+const CreateEvent = ({ route,  LoggedInUser }) => {
+  const navigation = useNavigation();
+  const [selectedIndex, setSelectedIndex] = useState([new IndexPath(0)]);
+  const [SportList, setSportsList] = useState([]);
+  const [LoadingVisible, setLoadingVisibility] = useState(true);
+
+  useEffect(async () => {
+    const sports = await GetSports();
+    setSportsList(sports);
+    setLoadingVisibility(false)
+  }, []);
 
   const [userInput, setUserInput] = useState({
+    creator: LoggedInUser.uuid,
     EventName: "",
-    sports: "",
-    startDate: "",
-    StartHour: "",
-    StartMinute: "",
+    sports: [],
+    beginDate: "",
     endDate: "",
-    EndHour: "",
-    EndMinute: "",
     participantsNumber: "",
     description: "",
+    // we get infrastructure id from the previous page change the line below to route.params.InfraId
+    infrastructureId: 12334,
   });
 
   const HandleUserInput = (Input, Name) => {
     setUserInput({ ...userInput, [Name]: Input });
   };
-  const [selectedIndex, setSelectedIndex] = useState(new IndexPath(0));
-  const data = ["Running", "Football", "Basketball", "Bowling"];
-  const SelectedSport = data[selectedIndex - 1];
+
+  let selectedSports = [];
+  selectedIndex.forEach((d) => {
+    selectedSports.push(SportList[d.row]);
+  });
+
   useEffect(() => {
-    setUserInput({ ...userInput, sports: data[selectedIndex - 1] });
+    setUserInput({ ...userInput, sports: selectedSports });
   }, [selectedIndex]);
 
   const createEvent = async () => {
     if (!checkProperties(userInput)) {
       try {
-        const response = await CreateAnEvent(userInput);
+        const response = await CreateAnEvent(userInput, LoggedInUser);
         if (response.ok) {
-          // navigate to next page
+          console.log(response);
+          alert("Event Created");
         } else {
-          alert("Something went wrong");
+          alert("Something went wrong , try again");
         }
       } catch (e) {
         console.error(e);
@@ -87,11 +101,12 @@ const CreateEvent = ({ navigation }) => {
             <View style={styles.FormItem}>
               <Text style={styles.InputLabel}>Sport:</Text>
               <Select
-                value={SelectedSport}
+                value={selectedSports.join(", ")}
+                multiSelect={true}
                 selectedIndex={selectedIndex}
                 onSelect={(index) => setSelectedIndex(index)}
               >
-                {data.map((d) => (
+                {SportList.map((d) => (
                   <SelectItem key={d} title={d} />
                 ))}
               </Select>
@@ -101,8 +116,8 @@ const CreateEvent = ({ navigation }) => {
             <View style={styles.DateTimeContainer}>
               <Datepicker
                 style={{ maxWidth: "100%" }}
-                date={userInput.startDate}
-                onSelect={(nextDate) => HandleUserInput(nextDate, "startDate")}
+                date={userInput.beginDate}
+                onSelect={(nextDate) => HandleUserInput(nextDate, "beginDate")}
               />
               <Icon style={styles.icon} fill="#000" name="calendar-outline" />
 
@@ -161,9 +176,14 @@ const CreateEvent = ({ navigation }) => {
           </Button>
         </View>
       </ScrollView>
-      <TouchableOpacity style={styles.BackBtn}>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.BackBtn}
+      >
         <Icon style={styles.icon} fill="#000" name="arrow-back-outline" />
       </TouchableOpacity>
+      {LoadingVisible &&   <LoadingBlockScreen />}
+
     </KeyboardAvoidingView>
   );
 };

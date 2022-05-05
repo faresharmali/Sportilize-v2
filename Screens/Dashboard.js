@@ -15,8 +15,11 @@ const Dashboard = ({ NavigateToScreen, LoggedInUser }) => {
       <Header NavigateToScreen={NavigateToScreen} LoggedInUser={LoggedInUser} />
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="CreateEvent" component={CreateEvent} />
           <Stack.Screen name="Map" component={Map} />
+
+          <Stack.Screen name="CreateEvent">
+            {(props) => <CreateEvent {...props} LoggedInUser={LoggedInUser} />}
+          </Stack.Screen>
         </Stack.Navigator>
         <Footer />
       </NavigationContainer>
